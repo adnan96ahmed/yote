@@ -1,5 +1,62 @@
 #/usr/bin/ruby
 
+
+class Position
+#-------------------------------------------------------------Members
+	
+	# Colour piece
+#-------------------------------------------------------------public funstions
+	def initialize(position)
+		@position = position
+		@piece = :empty
+	end
+	
+	def atPosition()
+		return @piece 
+	end
+
+	def setPosition(value)
+		@piece = value
+	end
+
+	def to_s()
+		"In Position: #{@position} #{@piece}\n"
+	end
+# ------------------------------------------------------------Private Funtions    
+end
+
+class Board
+#-------------------------------------------------------------Members
+
+	# Position board[@rows][@columns]
+#-------------------------------------------------------------public funstions
+	def initialize(rows, columns)
+		@rows = rows
+		@columns = columns
+		@board = Array.new(rows+1){|i|Array.new(columns+1) {|j| Position.new([i,j])}}
+
+
+	end
+
+	def atPosition(coord)
+
+	end
+
+	def board
+		return @board
+	end
+
+	# voiddrawBoard(Player:white,Player:black
+	# ColouratPosition(Coordinate:coord)
+	# bool removeAt(Coordinate: coord)
+	# bool placeAt(Coordinate: coord, Colour: colour)
+	# int pieces(Colour)
+	# bool availableMove(Colour)
+	# string to_s()
+# ------------------------------------------------------------Private Funtions
+    
+end
+
 class Move
 #-------------------------------------------------------------Members
 
@@ -46,12 +103,14 @@ class Move
 
 	end
 
-	def findMoveType(source, gameBoard, destination)
-		if source == NULL and gameBoard.atPosition() == 0
+	def findMoveType()
+		if @source == nil and @gameBoard.atPosition(@destination) == :empty 
+			#and (0..@gameBoard.rows) === @source[0] and (0..@gameBoard.rows) === @destination[0] and (0..@gameBoard.columns) === @source[1] and (0..@gameBoard.columns) === @source[1]
 			@move = :placement
 		else
 			@move = :illegal
 		end
+
 	end
 
 
@@ -74,10 +133,13 @@ class Move
 
 end
 
-hi = [1, 2]
+source = [1, 2]
 bye = [3,4]
 no = [5,6]
-object = Move.new(hi, bye, "black", no)
-puts object.findMoveType()
-puts object.source
+
+board = Board.new(4, 5)
+move = Move.new(source, bye, "black", board)
+puts board.board()
+puts move.findMoveType()
+puts move.source
 
