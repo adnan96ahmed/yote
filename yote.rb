@@ -90,33 +90,7 @@ CLASS YoteIO{
 # ------------------------------------------------------------Private Funtions    
 }
 
-CLASS Move{
-#-------------------------------------------------------------Members
-	Coordinate source
-	Coordinate destination
-	MoveType move
-	Colour playerColour
-	Board gameBoard
-#-------------------------------------------------------------public funstions
-	Move initialize(Coordinate: source, Coordinate: destination, Colour: playerColour, Board: gameBoard)
-	boolcompare(Move:lastMove)
-	bool validate()
-	int execute()
-	bool isPossibleMove()
-	string to_s()
-# ------------------------------------------------------------Private Funtions
-	MoveType findMoveType() 
-		x = 0, y = 1 # For easier reading
-		jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
-		result = (@gameBoard.atPosition(@jumped) != :empty &&
-         @gameBoard.atPosition(@jumped) != :playerColour)
-		if result == true @move = :capture
-			11
-		else
-			@move = :illegal 
-		end
 
-}
 
 CLASS Position{
 #-------------------------------------------------------------Members
