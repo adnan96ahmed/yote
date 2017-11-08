@@ -7,10 +7,10 @@ class GameManager
 			loadGame(filename)
 		end
 		@currentPlayer = 0
-		players = Array.new(2)
-		players[1] = :black 
-		players[0] = :white
-		gameBoard = Board.new([5,6])
+		@players = Array.new(2)
+		@players[1] = Players.new(:white)
+		@players[0] = Players.new(:black)
+		@gameBoard = Board.new(5,6)
 	end
 	
 	def loadGame(filename)
@@ -20,6 +20,7 @@ class GameManager
 	def newGame()
 		loop do
 			ret = @players[@currentPlayer].makeMove(@gameBoard)
+
 
 			# @gameBoard.drawBoard()
 
@@ -42,7 +43,7 @@ class GameManager
 
 	def checkGameOver()
 		0.upto(2) do |i|
-			@players[i].pieces()
+			# @players[i].pieces()
 		end
 	end
 
@@ -81,7 +82,7 @@ class Hand
 
 	end
 
-	def getCount()
+	def pieces()
 		return @pieceCount
 	end
 
@@ -90,9 +91,6 @@ end
 
 class YoteIO
 
-	def initialize()
-
-	end
 
 	def serializeGame(game, filename)
 
@@ -103,43 +101,84 @@ class YoteIO
 	end
 
 	def getCoordinates(prompt)
-		puts prompt 
-		input = gets
+		puts prompt
+		res = 0	
 
-		if input == "forfeit"
-			return [-1, -1]
-		elsif input == "save"
-			return [-2, -2]
-		else
-			coords1 = Hash.new()
-			coords1["a"] = 0
-			coords1["b"] = 1
-			coords1["c"] = 2
-			coords1["d"] = 3
-			coords1["e"] = 4
+		loop do
+			input = gets.chomp
 
-			if /[0-5]+[a-eA-E]/.match(input)
-				x = input[0]
+			if input.eql? 'forfeit'
+				return [-1, -1]
+			elsif input.eql? 'save'
+				return [-2, -2]
+			else
+				coords1 = Hash.new()
+				coords1["a"] = 0
+				coords1["b"] = 1
+				coords1["c"] = 2
+				coords1["d"] = 3
+				coords1["e"] = 4
+
+				regex1 = /[0-5]+[a-eA-E]/
+				regex2 = /[a-eA-E]+[0-5]/
+
+				if prompt.include? "source"
+					if regex1.match(input)		
+						x = Integer(input[0])
+						y = coords1[input[1]]
+						res = [x, y]
+						break
+					elsif regex2.match(input)
+						x = coords1[input[0]]
+						y = Integer(input[1])
+						res = [x, y]
+						break
+					elsif input.empty?
+						res = nil
+						break 
+					else
+						printLine("Character does not fall within range of a to e or numeric 0 to 7")
+						puts prompt
+					end
+
+				end
+			
+
+			if regex1.match(input)
+				if /^$/.match(input)
+					res = nil
+					break 
+				end
+				x = Integer(input[0])
 				y = coords1[input[1]]
-			elsif /[a-eA-E]+[0-5]/.match(input)
+				res = [x, y]
+				break
+			elsif regex2.match(input)
+				if /^$/.match(input)
+					res = nil
+					break 
+				end
 				x = coords1[input[0]]
-				y = input[1]
+				y = Integer(input[1])
+				res = [x, y]
+				break
 			else
 				printLine("Character does not fall within range of a to e or numeric 0 to 7")
+				puts prompt
 			end
-
-			res = [x, y]
-
-			return res
-
 		end
 
-	end
+	end 
 
-	def printLine(prompt)
-		puts prompt
-		puts "\n"
-	end
+	return res
+
+
+end
+
+def printLine(prompt)
+	puts prompt
+	puts "\n"
+end
 
 end
 
@@ -157,7 +196,35 @@ class Players
 	def makeMove(gameBoard)
 		io = YoteIO.new()
 
-		io.getCoordinates("Please enter the source coordinate (leave blank if placing a piece)\n")
+		res1 = io.getCoordinates("Please enter the source coordinate (leave blank if placing a piece)\n")
+
+		if res1 == [-1, -1]
+			puts "forfeit"
+			return -1
+		elsif res1 == [-2, -2]
+			puts "save"
+			return -2
+		end
+
+
+		res2 = io.getCoordinates("Please enter the destination coordinate\n")
+
+		if res2 == [-1, -1]
+			puts "forfeit"
+			return -1
+		elsif res2 == [-2, -2]
+			puts "save"
+			return -2
+		end
+
+		p res1 	
+		p res2
+
+		move = Move.new(res1, res2, @playerColour, gameBoard)
+		testing = move.validate()
+
+		p testing
+
 	end
 
 	#not done
@@ -197,7 +264,7 @@ class Position
 	def to_s()
 		"In Position: #{@position} #{@piece}\n"
 	end
-    
+
 end
 
 class Board
@@ -224,7 +291,6 @@ class Board
 
 	def removeAt(coord)
 		if (coord[0].between?(0..@row) and coord[1].between?(0..@column)) or coord == nil?
-
 			return false
 		end
 		@board[coord[0]][coord[1]].setPosition(:empty)
@@ -249,12 +315,15 @@ class Board
 			0.upto(@columns) do |j|
 				if @board[i][j].atPosition() == colour
 					temp.push(@board[i][j])
+					move = Move.new(@boart[i][j].atPosition(), 0, colour, @board)
+					val = move.isPossibleMove()
+					if val == true
+						return true
+					end
 				end
 			end
 		end
-
-		#wait for answer
-
+		return false
 	end
 
 end
@@ -284,9 +353,11 @@ class Move
 
 	#done
 	def validate()
-		result = findMoveType()
+		@move = findMoveType()
 
-		if result == :illegal
+		p @move
+
+		if @move == :illegal
 			return false 
 		end
 
@@ -336,19 +407,31 @@ class Move
 		x = 0
 		y = 1
 
-		jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
-
-		puts jumped 
-
-		result = (@gameBoard.atPosition(jumped) != @playerColour)
-
-		puts result
-
-		if result == true
-			@move = :capture
+		if @source.nil? and @gameBoard.atPositon(@destination).empty?
+			p 1
+			@move = :placement
+		elsif (((@source[x] - @destination[x]).abs == 1) or ((@source[y] - @destination[y]).abs == 1)) and (@gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty)
+			p 2
+			@move = :move
+		elsif (((@source[x] - @destination[x]).abs == 2) or ((@source[y] - @destination[y]).abs == 2))
+			p 3
+			if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
+				jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
+				result = (@gameBoard.atPosition(@jumped) != :empty && @gameBoard.atPosition(@jumped) != :playerColour)
+				if result == true
+					@move = :capture
+				else
+					@move = :illegal
+				end
+			else
+				@move = :illegal
+			end
 		else
+			p 4
 			@move = :illegal
 		end
+
+		p @move
 
 	end
 
@@ -387,10 +470,10 @@ dest = [1, 3]
 board = Board.new(5, 6)
 move = Move.new(source, dest, "black", board)
 blah = YoteIO.new()
+manage = GameManager.new()
+
+manage.newGame()
 
 
-puts board.board()
-puts move.findMoveType()
 
-puts blah.getCoordinates("enter something")
 
