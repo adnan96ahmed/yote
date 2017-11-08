@@ -2,6 +2,7 @@
 
 class GameManager
 
+	#done
 	def initialize(filename=nil)
 		if filename.nil?
 			loadGame(filename)
@@ -13,10 +14,12 @@ class GameManager
 		@gameBoard = Board.new(5,6)
 	end
 	
+	#not done
 	def loadGame(filename)
 
 	end
 	
+	#not done
 	def newGame()
 		loop do
 			ret = @players[@currentPlayer].makeMove(@gameBoard)
@@ -37,20 +40,24 @@ class GameManager
 		#stuff ehre
 	end
 
+	#not done
 	def saveGame()
 
 	end
 
+	#not done
 	def checkGameOver()
 		0.upto(2) do |i|
 			# @players[i].pieces()
 		end
 	end
 
+	#not done
 	def to_s()
 
 	end
 
+	#not done
 	def forfeit(colour)
 
 	end  
@@ -58,15 +65,18 @@ end
 
 class Hand
 
+	#done
 	def initialize(playerColour)
 		@playerColour = playerColour
 		@pieceCount = 12
 	end
 
+	#done
 	def empty()
 		return @pieceCount == 0
 	end
 
+	#done
 	def removePiece()
 		result = empty()
 
@@ -78,10 +88,12 @@ class Hand
 		return true
 	end
 
+	#not done
 	def to_s()
 
 	end
 
+	#done
 	def pieces()
 		return @pieceCount
 	end
@@ -91,15 +103,17 @@ end
 
 class YoteIO
 
-
+	#not done
 	def serializeGame(game, filename)
 
 	end
 
+	#not done
 	def unserializeGame(filename)
 
 	end
 
+	#done (need to see feedback from other team, otherwise its pretty much done)
 	def getCoordinates(prompt)
 		puts prompt
 		res = 0	
@@ -142,43 +156,44 @@ class YoteIO
 					end
 
 				end
-			
 
-			if regex1.match(input)
-				if /^$/.match(input)
-					res = nil
-					break 
+
+				if regex1.match(input)
+					if /^$/.match(input)
+						res = nil
+						break 
+					end
+					x = Integer(input[0])
+					y = coords1[input[1]]
+					res = [x, y]
+					break
+				elsif regex2.match(input)
+					if /^$/.match(input)
+						res = nil
+						break 
+					end
+					x = coords1[input[0]]
+					y = Integer(input[1])
+					res = [x, y]
+					break
+				else
+					printLine("Character does not fall within range of a to e or numeric 0 to 7")
+					puts prompt
 				end
-				x = Integer(input[0])
-				y = coords1[input[1]]
-				res = [x, y]
-				break
-			elsif regex2.match(input)
-				if /^$/.match(input)
-					res = nil
-					break 
-				end
-				x = coords1[input[0]]
-				y = Integer(input[1])
-				res = [x, y]
-				break
-			else
-				printLine("Character does not fall within range of a to e or numeric 0 to 7")
-				puts prompt
 			end
-		end
 
-	end 
+		end 
 
-	return res
+		return res
 
 
-end
+	end
 
-def printLine(prompt)
-	puts prompt
-	puts "\n"
-end
+	#done
+	def printLine(prompt)
+		puts prompt
+		puts "\n"
+	end
 
 end
 
@@ -229,7 +244,7 @@ class Players
 
 	#not done
 	def pieces()
-		#come back to
+		
 	end
 
 	#done
@@ -241,7 +256,7 @@ class Players
 end
 
 
-
+#all done, shouldn't need to touch
 class Position
 
 	#done
@@ -269,26 +284,31 @@ end
 
 class Board
 
+	#done
 	def initialize(rows, columns)
 		@rows = rows
 		@columns = columns
 		@board = Array.new(rows){|i|Array.new(columns) {|j| Position.new([i,j])}}
 	end
 
+	#done
 	def atPosition(coord)
 		return @board[coord[0]][coord[1]].atPosition()
 	end
 
-	def board
+	#not done
+	def drawBoard
 		return @board
 	end
 
+	#done
 	def placeAt(coord, colour)
 		if colour == :empty or (coord[0].between?(0..@row) and coord[1].between?(0..@column)) or coord == nil?
 			return false
 		end
 	end
 
+	#done
 	def removeAt(coord)
 		if (coord[0].between?(0..@row) and coord[1].between?(0..@column)) or coord == nil?
 			return false
@@ -297,8 +317,7 @@ class Board
 		return  true 
 	end
 
-
-
+	#done
 	def pieces(colour)
 		count = 0
 		0.upto(@rows) do |i|
@@ -309,7 +328,7 @@ class Board
 		return count
 	end
 
-	#not done
+	#not done?
 	def availableMove(colour)
 		0.upto(@rows) do |i|
 			0.upto(@columns) do |j|
@@ -365,7 +384,7 @@ class Move
 
 	end
 
-	#should be done 
+	#should be done?
 	def isPossibleMove()
 		x = @source[0]
 		y = @source[1]
@@ -407,7 +426,7 @@ class Move
 		x = 0
 		y = 1
 
-		if @source.nil? and @gameBoard.atPositon(@destination).empty?
+		if @source.nil? and @gameBoard.atPosition(@destination).empty?
 			p 1
 			@move = :placement
 		elsif (((@source[x] - @destination[x]).abs == 1) or ((@source[y] - @destination[y]).abs == 1)) and (@gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty)
