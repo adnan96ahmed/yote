@@ -13,12 +13,12 @@ class GameManager
 		@players[0] = Players.new(:black)
 		@gameBoard = Board.new(5,6)
 	end
-	
+
 	#not done
 	def loadGame(filename)
 
 	end
-	
+
 	#not done
 	def newGame()
 		loop do
@@ -32,7 +32,7 @@ class GameManager
 			if ret == false
 				@currentPlayer = (@currentPlayer + 1) % 2
 			else
-				break 
+				break
 			end
 
 		end
@@ -60,7 +60,7 @@ class GameManager
 	#not done
 	def forfeit(colour)
 
-	end  
+	end
 end
 
 class Hand
@@ -116,75 +116,61 @@ class YoteIO
 	#done (need to see feedback from other team, otherwise its pretty much done)
 	def getCoordinates(prompt)
 		puts prompt
-		res = 0	
+		res = 0
+		input = gets.chomp
 
-		loop do
-			input = gets.chomp
+		if input.eql? 'forfeit'
+			return [-1, -1]
+		elsif input.eql? 'save'
+			return [-2, -2]
+		else
+			coords1 = Hash.new()
+			coords1["a"] = 0
+			coords1["b"] = 1
+			coords1["c"] = 2
+			coords1["d"] = 3
+			coords1["e"] = 4
 
-			if input.eql? 'forfeit'
-				return [-1, -1]
-			elsif input.eql? 'save'
-				return [-2, -2]
-			else
-				coords1 = Hash.new()
-				coords1["a"] = 0
-				coords1["b"] = 1
-				coords1["c"] = 2
-				coords1["d"] = 3
-				coords1["e"] = 4
+			regex1 = /[0-5]+[a-eA-E]/
+			regex2 = /[a-eA-E]+[0-5]/
 
-				regex1 = /[0-5]+[a-eA-E]/
-				regex2 = /[a-eA-E]+[0-5]/
-
-				if prompt.include? "source"
-					if regex1.match(input)		
-						x = Integer(input[0])
-						y = coords1[input[1]]
-						res = [x, y]
-						break
-					elsif regex2.match(input)
-						x = coords1[input[0]]
-						y = Integer(input[1])
-						res = [x, y]
-						break
-					elsif input.empty?
-						res = nil
-						break 
-					else
-						printLine("Character does not fall within range of a to e or numeric 0 to 7")
-						puts prompt
-					end
-
+			if prompt.include? "source"
+				p 20
+				if regex1.match(input)
+					x = Integer(input[0])
+					y = coords1[input[1]]
+					res = [x, y]
+				elsif regex2.match(input)
+					x = coords1[input[0]]
+					y = Integer(input[1])
+					res = [x, y]
+				elsif input.empty?
+					res = nil
 				end
-
+			else
 
 				if regex1.match(input)
 					if /^$/.match(input)
 						res = nil
-						break 
 					end
 					x = Integer(input[0])
 					y = coords1[input[1]]
 					res = [x, y]
-					break
+
 				elsif regex2.match(input)
 					if /^$/.match(input)
 						res = nil
-						break 
 					end
 					x = coords1[input[0]]
 					y = Integer(input[1])
 					res = [x, y]
-					break
 				else
-					printLine("Character does not fall within range of a to e or numeric 0 to 7")
-					puts prompt
+					res = nil
 				end
 			end
+			return res
+		end
 
-		end 
-
-		return res
 
 
 	end
@@ -211,40 +197,71 @@ class Players
 	def makeMove(gameBoard)
 		io = YoteIO.new()
 
-		res1 = io.getCoordinates("Please enter the source coordinate (leave blank if placing a piece)\n")
+		res1 = nil
+		res2 = nil
 
-		if res1 == [-1, -1]
-			puts "forfeit"
-			return -1
-		elsif res1 == [-2, -2]
-			puts "save"
-			return -2
+		loop do
+			res1 = io.getCoordinates("Please enter the source coordinate (leave blank if placing a piece)\n")
+
+			if res1 == [-1, -1]
+				puts "forfeit"
+				return -1
+			elsif res1 == [-2, -2]
+				puts "save"
+				return -2
+			end
+
+
+			res2 = io.getCoordinates("Please enter the destination coordinate\n")
+
+			if res2 == [-1, -1]
+				puts "forfeit"
+				return -1
+			elsif res2 == [-2, -2]
+				puts "save"
+				return -2
+			end
+
+			if res2 == nil
+				io.printLine("Character does not fall within range of a to e or numeric 1 to 6")
+				next
+			end
+
+			move = Move.new(res1, res2, @playerColour, gameBoard)
+			testing = move.validate()
+
+			if testing == false
+				io.printLine("Move is illegal.")
+				next
+			else
+				break
+			end
+
+			if res1.nil?
+				if @playerHand.empty() == true
+					next
+				end
+			end
+
+			if @lastMove != nil
+				compare = move.compare(@lastMove)
+				if compare == true
+					next
+				end
+			end
+
+			execute = move.execute()
+
 		end
 
 
-		res2 = io.getCoordinates("Please enter the destination coordinate\n")
 
-		if res2 == [-1, -1]
-			puts "forfeit"
-			return -1
-		elsif res2 == [-2, -2]
-			puts "save"
-			return -2
-		end
-
-		p res1 	
-		p res2
-
-		move = Move.new(res1, res2, @playerColour, gameBoard)
-		testing = move.validate()
-
-		p testing
 
 	end
 
 	#not done
 	def pieces()
-		
+
 	end
 
 	#done
@@ -264,10 +281,10 @@ class Position
 		@position = position
 		@piece = :empty
 	end
-	
+
 	#done
 	def atPosition()
-		return @piece 
+		return @piece
 	end
 
 	#done
@@ -314,7 +331,7 @@ class Board
 			return false
 		end
 		@board[coord[0]][coord[1]].setPosition(:empty)
-		return  true 
+		return  true
 	end
 
 	#done
@@ -359,13 +376,14 @@ class Move
 	end
 
 	#done
-	def compare(lastMove) 	
+	def compare(lastMove)
+
 		if lastMove.findMoveType() == :illegal or lastMove.findMoveType() == :placement or lastMove.findMoveType() == :capture
-			return false 
-		elsif lastMove.destination != @source 
-			return false 
-		elsif lastMove.source == @destination
-			return true 
+			return false
+		elsif (lastMove.destination != @source)
+			return false
+		elsif (lastMove.source == @destination)
+			return true
 		end
 
 	end
@@ -377,7 +395,7 @@ class Move
 		p @move
 
 		if @move == :illegal
-			return false 
+			return false
 		end
 
 		return true
@@ -389,31 +407,35 @@ class Move
 		x = @source[0]
 		y = @source[1]
 
-		res1 = @gameBoard.atPosition([x+1,y]) 
-		res2 = @gameBoard.atPosition([x+2,y]) 
+		# check positive x coordinate for valid moves
+		res1 = @gameBoard.atPosition([x+1,y])
+		res2 = @gameBoard.atPosition([x+2,y])
 		if res1 == :empty or (res1 != :empty and res2 != @playerColour)
-			return true 
+			return true
 		end
 
+		# check negative x coordinate for valid moves
 		res1 = @gameBoard.atPosition([x-1,y])
-		res2 = @gameBoard.atPosition([x-2,y]) 
+		res2 = @gameBoard.atPosition([x-2,y])
 		if res1 == :empty or (res1 != :empty and res2 != @playerColour)
-			return true 
+			return true
 		end
 
+		# check positive y coordinate for valid moves
 		res1 = @gameBoard.atPosition([x,y+1])
-		res2 = @gameBoard.atPosition([x,y+2]) 
+		res2 = @gameBoard.atPosition([x,y+2])
 		if res1 == :empty or (res1 != :empty and res2 != @playerColour)
-			return true 
+			return true
 		end
 
+		# check negative y coordinate for valid moves
 		res1 = @gameBoard.atPosition([x,y-1])
-		res2 = @gameBoard.atPosition([x,y-2]) 
+		res2 = @gameBoard.atPosition([x,y-2])
 		if res1 == :empty or (res1 != :empty and res2 != @playerColour)
-			return true 
+			return true
 		end
 
-		return false 
+		return false
 	end
 
 	#not done
@@ -421,40 +443,44 @@ class Move
 
 	end
 
-	#not done
+	#done
 	def findMoveType()
 		x = 0
 		y = 1
 
-		if @source.nil? and @gameBoard.atPosition(@destination).empty?
-			p 1
-			@move = :placement
-		elsif (((@source[x] - @destination[x]).abs == 1) or ((@source[y] - @destination[y]).abs == 1)) and (@gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty)
-			p 2
-			@move = :move
-		elsif (((@source[x] - @destination[x]).abs == 2) or ((@source[y] - @destination[y]).abs == 2))
-			p 3
+		# check if its a placement move by simply checking if the source corodinate does not exist
+		if @source.nil? and @gameBoard.atPosition(@destination) == :empty
+			return :placement
+		end
+
+		# check if the move is of type move by checking if there is a coordinate difference of 1.
+		if ((@source[0] - @destination[0]).abs == 1 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 1 and (@source[0] - @destination[0]).abs == 0)
+			if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
+				return :move
+			else
+				return :illegal
+			end
+		end
+
+		# check if the move is a capture by checking if there is a coordinate difference of 2, then checks if you skipped over a piece
+		if ((@source[0] - @destination[0]).abs == 2 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 2 and (@source[0] - @destination[0]).abs == 0)
 			if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
 				jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
 				result = (@gameBoard.atPosition(@jumped) != :empty && @gameBoard.atPosition(@jumped) != :playerColour)
+
 				if result == true
-					@move = :capture
+					return :capture
 				else
-					@move = :illegal
+					return :illegal
 				end
 			else
-				@move = :illegal
+				return :illegal
 			end
-		else
-			p 4
-			@move = :illegal
 		end
-
-		p @move
 
 	end
 
-	#not done
+	#not done (finished up to step 5 in document. Read the rest)
 	def execute()
 		if @move == :illegal
 			return -1
@@ -466,18 +492,15 @@ class Move
 			return 0
 		end
 
-		if @move == :movement 
+		if @move == :movement
 			@gameBoard.removeAt(@source)
 			return 0
-		end	
+		end
 
 		if @move == :capture
 			@gameBoard.removeAt(@source)
 			jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
 			@gameBoard.removeAt(@jumped)
-
-
-
 		end
 	end
 
