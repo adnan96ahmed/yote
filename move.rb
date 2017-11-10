@@ -22,10 +22,10 @@ class GameManager
 	#not done
 	def newGame()
 		loop do
+			
+			@gameBoard.drawBoard(@players[0], @players[1])
+			
 			ret = @players[@currentPlayer].makeMove(@gameBoard)
-
-
-			# @gameBoard.drawBoard()
 
 			ret = checkGameOver()
 
@@ -259,9 +259,9 @@ class Players
 
 	end
 
-	#not done
-	def pieces()
-
+	#done
+	def pieces(board)
+		return @playerHand.pieces() + board.pieces(@playerColour)
 	end
 
 	#done
@@ -312,12 +312,40 @@ class Board
 	def atPosition(coord)
 		return @board[coord[0]][coord[1]].atPosition()
 	end
-
-	#not done
-	def drawBoard
-		return @board
+	
+	#done
+	def drawBoard(player1, player2)
+		io = YoteIO.new()
+	    x_coor = 0
+	    i=0
+		output = "  a b c d e"
+	    puts(output)
+	    while i < 6 do
+	        output = (i+1).to_s
+	        j=0
+	        while j < 11 do
+	            if j%2 == 1
+	            	if atPosition(i+x_coor) == :white
+	                	output << "*"
+	                elsif atPosition(i+x_coor) == :black
+	                	output << "^"
+	                else
+	                	output << "-"
+	                end
+	            else
+	                output << "|"
+	            end
+	            j += 1
+	        end
+	        puts(output)
+	        i += 1
+	    end
+	    puts("Remaining pieces:")
+	    output = "Player 1: " + (player1.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
+	    output << " Player 2: " + (player2.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
+	    io.printLine(output)
 	end
-
+	
 	#done
 	def placeAt(coord, colour)
 		if colour == :empty or (coord[0].between?(0..@row) and coord[1].between?(0..@column)) or coord == nil?
