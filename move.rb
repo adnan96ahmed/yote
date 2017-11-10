@@ -1,5 +1,5 @@
 #/usr/bin/ruby
-
+require "yaml"
 class GameManager
 
 	#done
@@ -9,8 +9,8 @@ class GameManager
 		end
 		@currentPlayer = 0
 		@players = Array.new(2)
-		@players[1] = Players.new(:white)
-		@players[0] = Players.new(:black)
+		@players[1] = Player.new(:white)
+		@players[0] = Player.new(:black)
 		@gameBoard = Board.new(5,6)
 	end
 
@@ -32,12 +32,11 @@ class GameManager
 			if ret == false
 				@currentPlayer = (@currentPlayer + 1) % 2
 			else
-				break
+				# puts("Winning player: #{@currentPlayer}")
+				# ret
 			end
 
 		end
-
-		#stuff ehre
 	end
 
 	#not done
@@ -54,6 +53,9 @@ class GameManager
 
 	#not done
 	def to_s()
+		# "In Position: #{@position} #{@piece}\n"
+		# @currentPlayer = 0
+		# @player = Array.new(2)
 
 	end
 
@@ -88,9 +90,9 @@ class Hand
 		return true
 	end
 
-	#not done
+	#done
 	def to_s()
-
+		"In Hand:\n #{@playerColour} #{@pieceCount}\n" 
 	end
 
 	#done
@@ -118,7 +120,6 @@ class YoteIO
 		puts prompt
 		res = 0
 		input = gets.chomp
-
 		if input.eql? 'forfeit'
 			return [-1, -1]
 		elsif input.eql? 'save'
@@ -130,6 +131,7 @@ class YoteIO
 			coords1["c"] = 2
 			coords1["d"] = 3
 			coords1["e"] = 4
+			coords1["f"] = 5
 
 			regex1 = /[0-5]+[a-eA-E]/
 			regex2 = /[a-eA-E]+[0-5]/
@@ -168,6 +170,7 @@ class YoteIO
 					res = nil
 				end
 			end
+			puts "coordinates  = #{res}"
 			return res
 		end
 
@@ -184,7 +187,7 @@ class YoteIO
 end
 
 
-class Players
+class Player
 
 	#done
 	def initialize(playerColour)
@@ -317,13 +320,11 @@ class Board
 	def drawBoard(player1, player2)
 		io = YoteIO.new()
 	    x_coor = 0
-	    i=0
-		output = "  a b c d e"
+		output = "  a b c d e f"
 	    puts(output)
-	    while i < 6 do
+	    for i in 0..4
 	        output = (i+1).to_s
-	        j=0
-	        while j < 11 do
+	        for j in 0..12
 	            if j%2 == 1
 	            	if atPosition(i+x_coor) == :white
 	                	output << "*"
@@ -335,14 +336,12 @@ class Board
 	            else
 	                output << "|"
 	            end
-	            j += 1
 	        end
 	        puts(output)
-	        i += 1
 	    end
 	    puts("Remaining pieces:")
 	    output = "Player 1: " + (player1.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
-	    output << " Player 2: " + (player2.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
+	    output << "\nPlayer 2: " + (player2.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
 	    io.printLine(output)
 	end
 	
@@ -388,6 +387,10 @@ class Board
 			end
 		end
 		return false
+	end
+
+	def to_s()
+		"In Board:\n #{@rows} #{@columns} #{@board}\n" 
 	end
 
 end
@@ -466,9 +469,9 @@ class Move
 		return false
 	end
 
-	#not done
+	#done
 	def to_s()
-
+		"In Move: #{@source} #{@destination} #{@playerColour} #{@move} #{@gameBoard.to_s} \n"
 	end
 
 	#done
