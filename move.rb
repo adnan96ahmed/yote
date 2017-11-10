@@ -115,7 +115,8 @@ class YoteIO
 
 	end
 
-	#done (need to see feedback from other team, otherwise its pretty much done)
+	#undone-->alliyya (need to see feedback from other team, otherwise its pretty much done)
+	# letters are supposed to refer to the rows 
 	def getCoordinates(prompt)
 		puts prompt
 		res = 0
@@ -316,10 +317,13 @@ class Board
 		return @board[coord[0]][coord[1]].atPosition()
 	end
 	
-	#done
+	#undone
 	def drawBoard(player1, player2)
 		io = YoteIO.new()
 	    x_coor = 0
+	    # need to go x,y
+	    # y --> rows(a-e)
+	    # x --> cols(0-4)
 		output = "  a b c d e f"
 	    puts(output)
 	    for i in 0..4
