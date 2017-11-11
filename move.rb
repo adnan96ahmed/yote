@@ -101,7 +101,6 @@ class Hand
 	def pieces()
 		return @pieceCount
 	end
-	
 end
 
 class YoteIO
@@ -204,6 +203,7 @@ class Player
 		res2 = nil
 
 		loop do
+			puts @playerColour.to_s() + "'s turn\n"
 			res1 = io.getCoordinates("Please enter the source coordinate (leave blank if placing a piece)\n")
 
 			if res1 == [-1, -1]
@@ -281,6 +281,11 @@ class Player
 	def pieces(board)
 		return @playerHand.pieces() + board.pieces(@playerColour)
 	end
+	
+	#method not from doc, created to show remaining hand pieces only
+	def handPieces(board)
+		return @playerHand.pieces()
+	end
 
 	#done
 	def storeLastMove(lastMove)
@@ -357,12 +362,12 @@ class Board
 	    end
 
 	    puts("Remaining pieces:")
-
-	    p player1.pieces(self)
+	    puts("p1: \n")
+	    p player1.handPieces(self)
 	    p self.pieces(player1.instance_variable_get(:@playerColour))
-	    output = "Player 1: " + (player1.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
-	    output << "\nPlayer 2: " + (player2.pieces(self) - self.pieces(player2.instance_variable_get(:@playerColour))).to_s()
-	    io.printLine(output)
+	    puts("p2: \n")
+	    p player2.handPieces(self)
+	    p self.pieces(player2.instance_variable_get(:@playerColour))
 	end
 
 	#done
@@ -506,7 +511,7 @@ class Move
 		x = 0
 		y = 1
 
-		# check if its a placement move by simply checking if the source corodinate does not exist
+		# check if its a placement move by simply checking if the source coordinate does not exist
 		if @source.nil? and @gameBoard.atPosition(@destination) == :empty
 			return :placement
 		end
