@@ -23,6 +23,7 @@ class GameManager
 	def newGame()
 		loop do
 
+			p @currentPlayer
 			@gameBoard.drawBoard(@players[0], @players[1])
 
 			ret1 = @players[@currentPlayer].makeMove(@gameBoard)
@@ -35,6 +36,7 @@ class GameManager
 				# puts("Winning player: #{@currentPlayer}")
 				# ret
 			end
+
 
 		end
 	end
@@ -49,6 +51,7 @@ class GameManager
 		0.upto(2) do |i|
 			# @players[i].pieces()
 		end
+		return false
 	end
 
 	#not done
@@ -382,7 +385,7 @@ class Board
 
 	#done
 	def removeAt(coord)
-		if (coord[0] === (0..@row) and coord[1] === (0..@column)) or coord.nil?
+		if (coord[0] === (0..@rows) and coord[1] === (0..@columns)) or coord.nil?
 			return false
 		end
 		@board[coord[0]][coord[1]].setPosition(:empty)
@@ -437,7 +440,7 @@ class Move
 	#done
 	def compare(lastMove)
 
-		if lastMove.findMoveType() == :illegal or lastMove.findMoveType() == :placement or lastMove.findMoveType() == :capture
+		if lastMove.instance_variable_get(:@move) == :illegal or lastMove.instance_variable_get(:@move) == :placement or lastMove.instance_variable_get(:@move) == :capture
 			return false
 		elsif (lastMove.destination != @source)
 			return false
@@ -525,7 +528,9 @@ class Move
 		if ((@source[0] - @destination[0]).abs == 2 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 2 and (@source[0] - @destination[0]).abs == 0)
 			if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
 				jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
-				result = (@gameBoard.atPosition(@jumped) != :empty && @gameBoard.atPosition(@jumped) != :playerColour)
+				result = (@gameBoard.atPosition(jumped) != :empty && @gameBoard.atPosition(jumped) != :playerColour)
+
+
 
 				if result == true
 					return :capture
@@ -558,8 +563,8 @@ class Move
 
 		if @move == :capture
 			@gameBoard.removeAt(@source)
-			jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
-			@gameBoard.removeAt(@jumped)
+			jumped = [(@destination[0] + @source[0]) / 2, (@destination[1] + @source[1]) / 2]
+			@gameBoard.removeAt(jumped)
 		end
 	end
 
