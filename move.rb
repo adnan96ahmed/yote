@@ -22,14 +22,14 @@ class GameManager
 	#not done
 	def newGame()
 		loop do
-			
+
 			@gameBoard.drawBoard(@players[0], @players[1])
-			
-			ret = @players[@currentPlayer].makeMove(@gameBoard)
 
-			ret = checkGameOver()
+			ret1 = @players[@currentPlayer].makeMove(@gameBoard)
 
-			if ret == false
+			ret2 = checkGameOver()
+
+			if ret2 == false
 				@currentPlayer = (@currentPlayer + 1) % 2
 			else
 				# puts("Winning player: #{@currentPlayer}")
@@ -92,7 +92,7 @@ class Hand
 
 	#done
 	def to_s()
-		"In Hand:\n #{@playerColour} #{@pieceCount}\n" 
+		"In Hand:\n #{@playerColour} #{@pieceCount}\n"
 	end
 
 	#done
@@ -116,7 +116,7 @@ class YoteIO
 	end
 
 	#undone-->alliyya (need to see feedback from other team, otherwise its pretty much done)
-	# letters are supposed to refer to the rows 
+	# letters are supposed to refer to the rows
 	def getCoordinates(prompt)
 		puts prompt
 		res = 0
@@ -138,14 +138,14 @@ class YoteIO
 			regex2 = /[a-eA-E]+[0-5]/
 
 			if prompt.include? "source"
-				p 20
+
 				if regex1.match(input)
 					x = Integer(input[0])
 					y = coords1[input[1]]
 					res = [x, y]
 				elsif regex2.match(input)
-					x = coords1[input[0]]
-					y = Integer(input[1])
+					x = Integer(input[1])
+					y = coords1[input[0]]
 					res = [x, y]
 				elsif input.empty?
 					res = nil
@@ -164,8 +164,8 @@ class YoteIO
 					if /^$/.match(input)
 						res = nil
 					end
-					x = coords1[input[0]]
-					y = Integer(input[1])
+					x = Integer(input[1])
+					y = coords1[input[0]]
 					res = [x, y]
 				else
 					res = nil
@@ -237,9 +237,8 @@ class Player
 			if testing == false
 				io.printLine("Move is illegal.")
 				next
-			else
-				break
 			end
+
 
 			if res1.nil?
 				if @playerHand.empty() == true
@@ -255,6 +254,24 @@ class Player
 			end
 
 			execute = move.execute()
+
+			 if execute == 1
+                #loop after capture to ask player to select an opponents piece to remove
+                loop do
+                    removeSelection = io.getCoordinates("Select a coordinate of an opponent's piece for it to be removed\n")
+                    #removeSelection coordinate cannot be empty or the same colour as the player selecting
+                    if gameBoard.atPosition(removeSelection) != :empty and gameBoard.atPosition(removeSelection) != @playerColour
+                        gameBoard.removeAt(removeSelection)
+                    else
+                        puts("An invalid coordinate was selected for removing an opponent's piece")
+                        break
+                    end
+                end
+            end
+
+			storeLastMove(move)
+
+			return 0
 
 		end
 
@@ -316,7 +333,7 @@ class Board
 	def atPosition(coord)
 		return @board[coord[0]][coord[1]].atPosition()
 	end
-	
+
 	#undone
 	def drawBoard(player1, player2)
 		io = YoteIO.new()
@@ -326,39 +343,46 @@ class Board
 	    # x --> cols(0-4)
 		output = "  a b c d e f"
 	    puts(output)
+
 	    for i in 0..4
-	        output = (i+1).to_s
-	        for j in 0..12
-	            if j%2 == 1
-	            	if atPosition(i+x_coor) == :white
-	                	output << "*"
-	                elsif atPosition(i+x_coor) == :black
-	                	output << "^"
-	                else
-	                	output << "-"
-	                end
-	            else
-	                output << "|"
-	            end
-	        end
-	        puts(output)
+	    	output = (i).to_s
+	    	for j in 0..12
+	    		if j%2 == 1
+		    		if atPosition([i,(j/2).floor]) == :white
+		    			output << "*"
+		    		elsif atPosition([i,(j/2).floor]) == :black
+		    			output << "^"
+		    		else
+		    			output << "-"
+		    		end
+		    	else
+		    		output << "|"
+	    		end
+	    	end
+	    	puts(output)
 	    end
+
 	    puts("Remaining pieces:")
 	    output = "Player 1: " + (player1.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
 	    output << "\nPlayer 2: " + (player2.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
 	    io.printLine(output)
 	end
-	
+
 	#done
 	def placeAt(coord, colour)
-		if colour == :empty or (coord[0].between?(0..@row) and coord[1].between?(0..@column)) or coord == nil?
+		if colour == :empty or (coord[0] === (0..@rows) and coord[1] === (0..@columns))
+
 			return false
+		else
+			p colour
+			@board[coord[0]][coord[1]].setPosition(colour)
+			return true
 		end
 	end
 
 	#done
 	def removeAt(coord)
-		if (coord[0].between?(0..@row) and coord[1].between?(0..@column)) or coord == nil?
+		if (coord[0] === (0..@row) and coord[1] === (0..@column)) or coord.nil?
 			return false
 		end
 		@board[coord[0]][coord[1]].setPosition(:empty)
@@ -394,7 +418,7 @@ class Board
 	end
 
 	def to_s()
-		"In Board:\n #{@rows} #{@columns} #{@board}\n" 
+		"In Board:\n #{@rows} #{@columns} #{@board}\n"
 	end
 
 end
@@ -521,7 +545,7 @@ class Move
 			return -1
 		end
 
-		@gameBoard.placeAt(@destination)
+		@gameBoard.placeAt(@destination, @playerColour)
 
 		if @move == :placement
 			return 0
