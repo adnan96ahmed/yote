@@ -44,22 +44,30 @@ class GameManager
 
 	end
 
-	#not done
+	#NOT DONE
 	def checkGameOver()
-		0.upto(2) do |i|
-			# @players[i].pieces()
+		if @players[0].pieces() <= 3 && @players[1].pieces() <= 3
+			return true
 		end
+		# Check if the next player to move (ie. @players[(@currentPlayer
+		# + 1) % 2]) has an available move to make. This is done in a
+		# few ways. First, to check for an empty place that a piece can be
+		# placed into use Board.pieces(:empty), then you must make sure
+		# the Player has a piece they may place by using Player.pieces().
+		# If both are not 0, then the player may place a piece. To check
+		# if the player has any pieces on the board they may move, use
+		# the Board.availableMove() function. This will return true or
+		# false based on if the Player has a move to make. If both of these
+		# conditions outlined are false, then the Player has no moves to make
+		# and the game is over
 	end
 
-	#not done
+	#done
 	def to_s()
-		# "In Position: #{@position} #{@piece}\n"
-		# @currentPlayer = 0
-		# @player = Array.new(2)
-
+		"In GameManager:\n #{@currentPlayer} #{@players[0].to_s} #{@players[1].to_s}\n"
 	end
 
-	#not done
+	#NOT DONE
 	def forfeit(colour)
 
 	end
@@ -105,18 +113,17 @@ end
 
 class YoteIO
 
-	#not done
+	#NOT done
 	def serializeGame(game, filename)
 
 	end
 
-	#not done
+	#NOT done
 	def unserializeGame(filename)
 
 	end
 
-	#undone-->alliyya (need to see feedback from other team, otherwise its pretty much done)
-	# letters are supposed to refer to the rows 
+	#done
 	def getCoordinates(prompt)
 		puts prompt
 		res = 0
@@ -126,56 +133,52 @@ class YoteIO
 		elsif input.eql? 'save'
 			return [-2, -2]
 		else
-			coords1 = Hash.new()
-			coords1["a"] = 0
-			coords1["b"] = 1
-			coords1["c"] = 2
-			coords1["d"] = 3
-			coords1["e"] = 4
-			coords1["f"] = 5
+			coord_y = Hash.new()
+			coord_y["a"] = 0
+			coord_y["b"] = 1
+			coord_y["c"] = 2
+			coord_y["d"] = 3
+			coord_y["e"] = 4
 
-			regex1 = /[0-5]+[a-eA-E]/
-			regex2 = /[a-eA-E]+[0-5]/
+			regex1 = /[1-6]+[a-eA-E]/
+			regex2 = /[a-eA-E]+[1-6]/
 
 			if prompt.include? "source"
-				p 20
+				# p 20
 				if regex1.match(input)
-					x = Integer(input[0])
-					y = coords1[input[1]]
+					x = Integer(input[0])-1
+					y = coord_y[input[1]]
 					res = [x, y]
 				elsif regex2.match(input)
-					x = coords1[input[0]]
-					y = Integer(input[1])
+					x = Integer(input[1])-1
+					y = coord_y[input[0]]
 					res = [x, y]
 				elsif input.empty?
 					res = nil
 				end
 			else
-
 				if regex1.match(input)
 					if /^$/.match(input)
 						res = nil
 					end
-					x = Integer(input[0])
-					y = coords1[input[1]]
+					x = Integer(input[0])-1
+					y = coord_y[input[1]]
 					res = [x, y]
 
 				elsif regex2.match(input)
 					if /^$/.match(input)
 						res = nil
 					end
-					x = coords1[input[0]]
-					y = Integer(input[1])
+					x = Integer(input[1])-1
+					y = coord_y[input[0]]
 					res = [x, y]
 				else
 					res = nil
 				end
 			end
-			puts "coordinates  = #{res}"
+			# puts "coordinates  = #{res}"
 			return res
 		end
-
-
 
 	end
 
@@ -258,9 +261,6 @@ class Player
 
 		end
 
-
-
-
 	end
 
 	#done
@@ -312,35 +312,35 @@ class Board
 		@board = Array.new(rows){|i|Array.new(columns) {|j| Position.new([i,j])}}
 	end
 
-	#done
+	#done --> doesn't work exactly when trying to call:/
 	def atPosition(coord)
 		return @board[coord[0]][coord[1]].atPosition()
 	end
 	
-	#undone
+	#done
 	def drawBoard(player1, player2)
 		io = YoteIO.new()
 	    x_coor = 0
-	    # need to go x,y
-	    # y --> rows(a-e)
-	    # x --> cols(0-4)
-		output = "  a b c d e f"
+		output = "  1 2 3 4 5 6"
+		y_axis = ['a', 'b', 'c', 'd', 'e']
 	    puts(output)
 	    for i in 0..4
-	        output = (i+1).to_s
+	        output = y_axis[i].to_s
 	        for j in 0..12
 	            if j%2 == 1
-	            	if atPosition(i+x_coor) == :white
+	            	if atPosition([i,x_coor]) == :white
 	                	output << "*"
-	                elsif atPosition(i+x_coor) == :black
+	                elsif atPosition([i,x_coor]) == :black
 	                	output << "^"
 	                else
 	                	output << "-"
 	                end
+	                x_coor = x_coor+1
 	            else
 	                output << "|"
 	            end
 	        end
+	        x_coor = 0
 	        puts(output)
 	    end
 	    puts("Remaining pieces:")
@@ -354,6 +354,8 @@ class Board
 		if colour == :empty or (coord[0].between?(0..@row) and coord[1].between?(0..@column)) or coord == nil?
 			return false
 		end
+		@board[coord[0]][coord[1]].setPosition(colour)
+		return true
 	end
 
 	#done
@@ -365,7 +367,7 @@ class Board
 		return  true
 	end
 
-	#done
+	#NOT DONE --> always 42
 	def pieces(colour)
 		count = 0
 		0.upto(@rows) do |i|
@@ -373,6 +375,20 @@ class Board
 				count = count + 1
 			end
 		end
+		# p colour
+		# p count
+
+		# This code here should work if atPosition is working properly and called right
+		# count = 0
+		# for i in 0..@rows
+		# 	for j in 0..@columns
+		# 		if atPosition([i,j]) == colour
+		# 			count = count + 1
+		# 		end
+		# 	end
+		# end
+		# p colour
+		# p count
 		return count
 	end
 
@@ -382,7 +398,7 @@ class Board
 			0.upto(@columns) do |j|
 				if @board[i][j].atPosition() == colour
 					temp.push(@board[i][j])
-					move = Move.new(@boart[i][j].atPosition(), 0, colour, @board)
+					move = Move.new(@board[i][j].atPosition(), 0, colour, @board)
 					val = move.isPossibleMove()
 					if val == true
 						return true
@@ -521,7 +537,7 @@ class Move
 			return -1
 		end
 
-		@gameBoard.placeAt(@destination)
+		@gameBoard.placeAt(@destination,@playerColour)
 
 		if @move == :placement
 			return 0
