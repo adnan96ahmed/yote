@@ -23,7 +23,6 @@ class GameManager
 	def newGame()
 		loop do
 
-			p @currentPlayer
 			@gameBoard.drawBoard(@players[0], @players[1])
 
 			ret1 = @players[@currentPlayer].makeMove(@gameBoard)
@@ -137,8 +136,8 @@ class YoteIO
 			coords1["e"] = 4
 			coords1["f"] = 5
 
-			regex1 = /[0-5]+[a-eA-E]/
-			regex2 = /[a-eA-E]+[0-5]/
+			regex1 = /[0-4]+[a-eA-E]/
+			regex2 = /[a-eA-E]+[0-4]/
 
 			if prompt.include? "source"
 
@@ -177,8 +176,6 @@ class YoteIO
 			puts "coordinates  = #{res}"
 			return res
 		end
-
-
 
 	end
 
@@ -258,15 +255,18 @@ class Player
 
 			execute = move.execute()
 
-			 if execute == 1
+			if execute == 1
                 #loop after capture to ask player to select an opponents piece to remove
                 loop do
                     removeSelection = io.getCoordinates("Select a coordinate of an opponent's piece for it to be removed\n")
+                    p removeSelection
                     #removeSelection coordinate cannot be empty or the same colour as the player selecting
-                    if gameBoard.atPosition(removeSelection) != :empty and gameBoard.atPosition(removeSelection) != @playerColour
-                        gameBoard.removeAt(removeSelection)
-                    else
+                    if removeSelection.nil? or gameBoard.atPosition(removeSelection) == :empty or gameBoard.atPosition(removeSelection) == @playerColour
+
                         puts("An invalid coordinate was selected for removing an opponent's piece")
+                        next
+                    else
+                        gameBoard.removeAt(removeSelection)
                         break
                     end
                 end
@@ -277,9 +277,6 @@ class Player
 			return 0
 
 		end
-
-
-
 
 	end
 
@@ -366,8 +363,11 @@ class Board
 	    end
 
 	    puts("Remaining pieces:")
+
+	    p player1.pieces(self)
+	    p self.pieces(player1.instance_variable_get(:@playerColour))
 	    output = "Player 1: " + (player1.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
-	    output << "\nPlayer 2: " + (player2.pieces(self) - self.pieces(player1.instance_variable_get(:@playerColour))).to_s()
+	    output << "\nPlayer 2: " + (player2.pieces(self) - self.pieces(player2.instance_variable_get(:@playerColour))).to_s()
 	    io.printLine(output)
 	end
 
@@ -395,9 +395,11 @@ class Board
 	#done
 	def pieces(colour)
 		count = 0
-		0.upto(@rows) do |i|
-			0.upto(@columns) do |j|
-				count = count + 1
+		for i in 0..4
+			for j in 0..5
+				if @board[i][j].atPosition() == colour
+					count = count + 1
+				end
 			end
 		end
 		return count
@@ -565,6 +567,7 @@ class Move
 			@gameBoard.removeAt(@source)
 			jumped = [(@destination[0] + @source[0]) / 2, (@destination[1] + @source[1]) / 2]
 			@gameBoard.removeAt(jumped)
+			return 1
 		end
 	end
 
