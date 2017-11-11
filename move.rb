@@ -267,8 +267,10 @@ class Player
                         break
                     end
                 end
+			elsif execute == 2
+				@playerHand.removePiece();
 			end
-
+				
 			storeLastMove(move)
 
 			return 0
@@ -551,8 +553,8 @@ class Move
 		@gameBoard.placeAt(@destination, @playerColour)
 
 		if @move == :placement
-			puts Move.superclass.name
-			return 0
+			return 2#returning distinct number for placement so removePiece() can be called
+			#return 0
 		end
 
 		if @move == :movement
