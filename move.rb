@@ -513,13 +513,14 @@ class Move
 
 		# check if its a placement move by simply checking if the source coordinate does not exist
 		if @source.nil? and @gameBoard.atPosition(@destination) == :empty
+			
 			return :placement
 		end
 
 		# check if the move is of type move by checking if there is a coordinate difference of 1.
 		if ((@source[0] - @destination[0]).abs == 1 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 1 and (@source[0] - @destination[0]).abs == 0)
 			if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
-				return :move
+				return :movement
 			else
 				return :illegal
 			end
@@ -542,7 +543,6 @@ class Move
 		end
 	end
 
-	#not done (finished up to step 5 in document. Read the rest)
 	def execute()
 		if @move == :illegal
 			return -1
@@ -551,6 +551,7 @@ class Move
 		@gameBoard.placeAt(@destination, @playerColour)
 
 		if @move == :placement
+			puts Move.superclass.name
 			return 0
 		end
 
