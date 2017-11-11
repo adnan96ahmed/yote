@@ -101,8 +101,7 @@ class Hand
 	def pieces()
 		return @pieceCount
 	end
-
-
+	
 end
 
 class YoteIO
@@ -215,7 +214,6 @@ class Player
 				return -2
 			end
 
-
 			res2 = io.getCoordinates("Please enter the destination coordinate\n")
 
 			if res2 == [-1, -1]
@@ -262,7 +260,6 @@ class Player
                     p removeSelection
                     #removeSelection coordinate cannot be empty or the same colour as the player selecting
                     if removeSelection.nil? or gameBoard.atPosition(removeSelection) == :empty or gameBoard.atPosition(removeSelection) == @playerColour
-
                         puts("An invalid coordinate was selected for removing an opponent's piece")
                         next
                     else
@@ -270,7 +267,7 @@ class Player
                         break
                     end
                 end
-            end
+			end
 
 			storeLastMove(move)
 
@@ -289,7 +286,6 @@ class Player
 	def storeLastMove(lastMove)
 		@lastMove = lastMove
 	end
-
 
 end
 
@@ -337,10 +333,8 @@ class Board
 	#undone
 	def drawBoard(player1, player2)
 		io = YoteIO.new()
-	    x_coor = 0
-	    # need to go x,y
-	    # y --> rows(a-e)
-	    # x --> cols(0-4)
+	    # x --> cols(a-f)
+	    # y --> rows(0-4)
 		output = "  a b c d e f"
 	    puts(output)
 
@@ -532,8 +526,6 @@ class Move
 				jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
 				result = (@gameBoard.atPosition(jumped) != :empty && @gameBoard.atPosition(jumped) != :playerColour)
 
-
-
 				if result == true
 					return :capture
 				else
@@ -543,7 +535,6 @@ class Move
 				return :illegal
 			end
 		end
-
 	end
 
 	#not done (finished up to step 5 in document. Read the rest)
@@ -573,16 +564,6 @@ class Move
 
 end
 
-source = [1, 2]
-dest = [1, 3]
 
-board = Board.new(5, 6)
-move = Move.new(source, dest, "black", board)
-blah = YoteIO.new()
 manage = GameManager.new()
-
 manage.newGame()
-
-
-
-
