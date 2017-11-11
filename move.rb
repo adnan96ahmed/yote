@@ -9,8 +9,8 @@ class GameManager
 		end
 		@currentPlayer = 0
 		@players = Array.new(2)
-		@players[1] = Player.new(:white)
-		@players[0] = Player.new(:black)
+		@players[0] = Player.new(:white)
+		@players[1] = Player.new(:black)
 		@gameBoard = Board.new(5,6)
 	end
 
