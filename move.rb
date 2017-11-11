@@ -257,6 +257,10 @@ class Player
 			execute = move.execute()
 
 		end
+
+
+
+
 	end
 
 	#done
@@ -537,7 +541,14 @@ class Move
 
 end
 
+source = [1, 2]
+dest = [1, 3]
+
+board = Board.new(5, 6)
+move = Move.new(source, dest, "black", board)
+blah = YoteIO.new()
 manage = GameManager.new()
+
 manage.newGame()
 
 
