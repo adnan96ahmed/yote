@@ -54,7 +54,15 @@ class GameManager
 			return true
 		end
 		
-		if @gameBoard.pieces(:empty) == 0 and @players[@currentPlayer].handPieces(@gameBoard) == 0 and @gameBoard.availableMove()
+		if @currentPlayer == 0
+			currentColour = :white
+		else
+			currentColour = :black
+		end
+			
+		#puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour)
+			
+		if @gameBoard.pieces(:empty) == 0 and @players[@currentPlayer].handPieces(@gameBoard) == 0 and @gameBoard.availableMove(currentColour) == false
 			puts("Game Over\n")
 			if @players[0].pieces(@gameBoard) > @players[1].pieces(@gameBoard)
 				puts("White Player Wins\n")
@@ -88,7 +96,7 @@ class Hand
 	#done
 	def initialize(playerColour)
 		@playerColour = playerColour
-		@pieceCount = 12
+		@pieceCount = 4
 	end
 
 	#done
@@ -422,11 +430,11 @@ class Board
 
 	#not done?
 	def availableMove(colour)
-		0.upto(@rows) do |i|
-			0.upto(@columns) do |j|
-				if @board[i][j].atPosition() == colour
-					temp.push(@board[i][j])
-					move = Move.new(@boart[i][j].atPosition(), 0, colour, @board)
+		for i in 0..4
+			for j in 0..5
+				if self.atPosition([i,j]) == colour
+					#temp.push(@board[i][j])
+					move = Move.new(self.atPosition([i,j]), 0, colour, self)
 					val = move.isPossibleMove()
 					if val == true
 						return true
@@ -481,7 +489,6 @@ class Move
 
 	end
 
-	#should be done?
 	def isPossibleMove()
 		x = @source[0]
 		y = @source[1]
@@ -580,6 +587,18 @@ class Move
 			@gameBoard.removeAt(@source)
 			jumped = [(@destination[0] + @source[0]) / 2, (@destination[1] + @source[1]) / 2]
 			@gameBoard.removeAt(jumped)
+			
+			if @playerColour == :white
+				oppositeColour = :black
+			else
+				oppositeColour = :white
+			end
+			#checking to return 1 if there is another opponent piece available to remove
+			if @gameBoard.pieces(oppositeColour) == 0
+				#no opponent pieces on board, returning 0
+				return 0
+			end
+			#return 1 because there are opponent's pieces on the board that can be removed
 			return 1
 		end
 	end
