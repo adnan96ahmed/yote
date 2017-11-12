@@ -19,17 +19,16 @@ class GameManager
 
 	end
 
-	#not done
 	def newGame()
 		loop do
 
 			@gameBoard.drawBoard(@players[0], @players[1])
 
-			ret1 = @players[@currentPlayer].makeMove(@gameBoard)
+			@players[@currentPlayer].makeMove(@gameBoard)
 
-			ret2 = checkGameOver()
+			ret = checkGameOver()
 
-			if ret2 == false
+			if ret == false
 				@currentPlayer = (@currentPlayer + 1) % 2
 			else
 				#break out of loop if game over
@@ -49,7 +48,6 @@ class GameManager
 	def checkGameOver()
 		#checking player pieces, not pieceCount as the doc accidentally says
 		if @players[0].pieces(@gameBoard) < 4 and @players[1].pieces(@gameBoard) < 4
-			#puts("Winning player: #{@currentPlayer}")
 			puts("Game has ended in draw\n")
 			return true
 		end
@@ -60,7 +58,7 @@ class GameManager
 			currentColour = :black
 		end
 			
-		puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour).to_s()
+		#puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour).to_s()
 			
 		if @gameBoard.pieces(:empty) == 0 and @players[@currentPlayer].handPieces(@gameBoard) == 0 and @gameBoard.availableMove(currentColour) == false
 			puts("Game Over\n")
@@ -71,6 +69,14 @@ class GameManager
 			else
 				puts("Game has ended in draw\n")
 			end
+			return true
+		end
+		
+		if @players[0].pieces(@gameBoard) == 0 
+			puts("Black Player Wins\n")
+			return true
+		elsif @players[1].pieces(@gameBoard) == 0 
+			puts("White Player Wins\n")
 			return true
 		end
 		
