@@ -175,17 +175,16 @@ class YoteIO
             coords1["c"] = 2
             coords1["d"] = 3
             coords1["e"] = 4
-            coords1["f"] = 5
-            regex1 = /[0-4]+[a-eA-E]/
-            regex2 = /[a-eA-E]+[0-4]/
+            regex1 = /[0-5]+[a-eA-E]/
+            regex2 = /[a-eA-E]+[0-5]/
             if prompt.include? "source"
                 if regex1.match(input)
-                    x = Integer(input[0])
-                    y = coords1[input[1]]
+                    x = coords1[input[1]]
+                    y = Integer(input[0])
                     res = [x, y]
                 elsif regex2.match(input)
-                    x = Integer(input[1])
-                    y = coords1[input[0]]
+                    x = coords1[input[0]]
+                    y = Integer(input[1])
                     res = [x, y]
                 elsif input.empty?
                     res = nil
@@ -195,15 +194,15 @@ class YoteIO
                     if /^$/.match(input)
                         res = nil
                     end
-                    x = Integer(input[0])
-                    y = coords1[input[1]]
+                    x = coords1[input[1]]
+                    y = Integer(input[0])
                     res = [x, y]
                 elsif regex2.match(input)
                     if /^$/.match(input)
                         res = nil
                     end
-                    x = Integer(input[1])
-                    y = coords1[input[0]]
+                    x = coords1[input[0]]
+                    y = Integer(input[1])
                     res = [x, y]
                 else
                     res = nil
@@ -384,11 +383,20 @@ class Board
 	def drawBoard(player1, player2)
 	    # x --> cols(a-f)
 	    # y --> rows(0-4)
-		output = "  a b c d e f"
+
+        coords1 = Hash.new()
+        coords1[0] = "a"
+        coords1[1] = "b"
+        coords1[2] = "c"
+        coords1[3] = "d"
+        coords1[4] = "e"
+
+
+		output = "  0 1 2 3 4 5"
 	    puts(output)
 
 	    for i in 0..4
-	    	output = (i).to_s
+	    	output = coords1[i]
 	    	for j in 0..12
 	    		if j%2 == 1
 		    		if atPosition([i,(j/2).floor]) == :white
@@ -494,8 +502,6 @@ class Move
 	def validate()
 		@move = findMoveType()
 
-		p @move
-
 		if @move == :illegal
 			return false
 		end
@@ -553,9 +559,9 @@ class Move
 		if @source.nil? and @gameBoard.atPosition(@destination) == :empty
 			return :placement
 		end
-			
+
 		# check if the move is of type move by checking if there is a coordinate difference of 1.
-		if @source != nil 
+		if @source != nil
 			if ((@source[0] - @destination[0]).abs == 1 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 1 and (@source[0] - @destination[0]).abs == 0)
 				if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
 					return :movement
@@ -571,7 +577,7 @@ class Move
 				if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
 					jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
 					result = (@gameBoard.atPosition(jumped) != :empty && @gameBoard.atPosition(jumped) != :playerColour)
-	
+
 					if result == true
 						return :capture
 					else
@@ -582,7 +588,7 @@ class Move
 				end
 			end
 		end
-		
+
 		puts "That coordinate is already taken"
 		return :illegal
 	end
