@@ -64,7 +64,7 @@ class GameManager
 			puts("Game Over\n")
 			if @players[0].pieces(@gameBoard) > @players[1].pieces(@gameBoard)
 				puts("White Player Wins\n")
-			elsif
+			elsif @players[0].pieces(@gameBoard) < @players[1].pieces(@gameBoard)
 				puts("Black Player Wins\n")
 			else
 				puts("Game has ended in draw\n")
@@ -439,7 +439,6 @@ class Board
 		for i in 0..4
 			for j in 0..5
 				if self.atPosition([i,j]) == colour
-					#temp.push(@board[i][j])
 					move = Move.new([i,j], [0,0], colour, self)
 					val = move.isPossibleMove()
 					if val == true
