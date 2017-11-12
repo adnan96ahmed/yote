@@ -51,9 +51,7 @@ class GameManager
 
 	end
 
-	#not done
-
-	#not done
+	#done
 	def checkGameOver()
 		#checking player pieces, not pieceCount as the doc accidentally says
 		if @players[0].pieces(@gameBoard) < 4 and @players[1].pieces(@gameBoard) < 4
@@ -66,8 +64,6 @@ class GameManager
 		else
 			currentColour = :black
 		end
-
-		puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour).to_s()
 
 		if @gameBoard.pieces(:empty) == 0 and @players[@currentPlayer].handPieces(@gameBoard) == 0 and @gameBoard.availableMove(currentColour) == false
 			puts("Game Over\n")
@@ -98,8 +94,7 @@ class GameManager
         file.close
 	end
 
-
-	#not done
+	#done
 	def to_s()
         "In GameManager:\n #{@currentPlayer} #{@players} #{@gameBoard.to_s}"
 	end
@@ -165,8 +160,6 @@ class YoteIO
 
 	end
 
-	#undone-->alliyya (need to see feedback from other team, otherwise its pretty much done)
-	# letters are supposed to refer to the rows
 	def getCoordinates(prompt)
 		puts prompt
         res = 0
@@ -216,7 +209,6 @@ class YoteIO
                     res = nil
                 end
             end
-            #puts "coordinates  = #{res}"
             return res
         else
             return [-3,-3]
@@ -241,7 +233,6 @@ class Player
 		@playerColour = playerColour
 	end
 
-	#working on
 	def makeMove(gameBoard)
 		io = YoteIO.new()
 
@@ -277,7 +268,7 @@ class Player
 			end
 
 			if res2 == nil
-				io.printLine("Character does not fall within range of a to e or numeric 1 to 6")
+				io.printLine("Character does not fall within range of a to f or numeric 0 to 4")
 				next
 			end
 
@@ -285,10 +276,9 @@ class Player
 			testing = move.validate()
 
 			if testing == false
-				io.printLine("Move is illegal.")
+				io.printLine("Move is illegal")
 				next
 			end
-
 
 			if res1.nil?
 				if @playerHand.empty() == true
@@ -324,11 +314,8 @@ class Player
 			end
 
 			storeLastMove(move)
-
 			return 0
-
 		end
-
 	end
 
 	#done
@@ -395,7 +382,6 @@ class Board
 
 	#undone
 	def drawBoard(player1, player2)
-		io = YoteIO.new()
 	    # x --> cols(a-f)
 	    # y --> rows(0-4)
 		output = "  a b c d e f"
@@ -420,16 +406,15 @@ class Board
 	    end
 
 	    puts("Remaining pieces:")
-	    puts "p1: In hand - " + player1.handPieces(self).to_s() + ", On Board - " +
+	    puts "White(*): In hand - " + player1.handPieces(self).to_s() + ", On Board - " +
 	    	self.pieces(player1.instance_variable_get(:@playerColour)).to_s() + ", Total - " + player1.pieces(self).to_s()
-	    puts "p2: In hand - " + player2.handPieces(self).to_s() + ", On Board - " +
+	    puts "Black(^): In hand - " + player2.handPieces(self).to_s() + ", On Board - " +
 	    	self.pieces(player2.instance_variable_get(:@playerColour)).to_s() + ", Total - " + player2.pieces(self).to_s()
 	end
 
 	#done
 	def placeAt(coord, colour)
 		if colour == :empty or (coord[0] === (0..@rows) and coord[1] === (0..@columns))
-
 			return false
 		else
 			p colour
@@ -460,7 +445,6 @@ class Board
 		return count
 	end
 
-	#not done?
 	def availableMove(colour)
 		for i in 0..4
 			for j in 0..5
@@ -567,34 +551,40 @@ class Move
 
 		# check if its a placement move by simply checking if the source coordinate does not exist
 		if @source.nil? and @gameBoard.atPosition(@destination) == :empty
-
 			return :placement
 		end
-
+			
 		# check if the move is of type move by checking if there is a coordinate difference of 1.
-		if ((@source[0] - @destination[0]).abs == 1 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 1 and (@source[0] - @destination[0]).abs == 0)
-			if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
-				return :movement
-			else
-				return :illegal
+		if @source != nil 
+			if ((@source[0] - @destination[0]).abs == 1 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 1 and (@source[0] - @destination[0]).abs == 0)
+				if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
+					return :movement
+				else
+					return :illegal
+				end
 			end
 		end
 
 		# check if the move is a capture by checking if there is a coordinate difference of 2, then checks if you skipped over a piece
-		if ((@source[0] - @destination[0]).abs == 2 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 2 and (@source[0] - @destination[0]).abs == 0)
-			if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
-				jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
-				result = (@gameBoard.atPosition(jumped) != :empty && @gameBoard.atPosition(jumped) != :playerColour)
-
-				if result == true
-					return :capture
+		if @source != nil
+			if ((@source[0] - @destination[0]).abs == 2 and (@source[1] - @destination[1]).abs == 0) or ((@source[1] - @destination[1]).abs == 2 and (@source[0] - @destination[0]).abs == 0)
+				if @gameBoard.atPosition(@source) == @playerColour and @gameBoard.atPosition(@destination) == :empty
+					jumped = [(@destination[x] + @source[x]) / 2, (@destination[y] + @source[y]) / 2]
+					result = (@gameBoard.atPosition(jumped) != :empty && @gameBoard.atPosition(jumped) != :playerColour)
+	
+					if result == true
+						return :capture
+					else
+						return :illegal
+					end
 				else
 					return :illegal
 				end
-			else
-				return :illegal
 			end
 		end
+		
+		puts "That coordinate is already taken"
+		return :illegal
 	end
 
 	def execute()
@@ -634,11 +624,7 @@ class Move
 		end
 	end
 
-
 end
 
-puts "Enter a file name to load a game (press enter if no file or wish to start a new game)"
-input = gets.chomp
-
-manage = GameManager.new(input)
+manage = GameManager.new()
 manage.newGame()
