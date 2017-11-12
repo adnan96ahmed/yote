@@ -21,7 +21,6 @@ class GameManager
 	def loadGame(filename)
         file = File.open(filename.to_s, "r")
         object = YAML.load(file)
-        pp object
 
 	end
 
@@ -89,7 +88,6 @@ class GameManager
 	end
 
 	def saveGame()
-        puts self
         file = File.open("YoteSave", "w")
         file.puts YAML::dump(self)
         file.close
