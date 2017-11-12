@@ -1,21 +1,27 @@
 #/usr/bin/ruby
 require "yaml"
+require "pp"
 class GameManager
 
 	#done
 	def initialize(filename=nil)
-		if filename.nil?
-			loadGame(filename)
-		end
+
+        if filename.nil? == false
+            loadGame(filename)
+        end
 		@currentPlayer = 0
 		@players = Array.new(2)
 		@players[0] = Player.new(:white)
 		@players[1] = Player.new(:black)
 		@gameBoard = Board.new(5,6)
+
 	end
 
 	#not done
 	def loadGame(filename)
+        file = File.open(filename.to_s, "r")
+        object = YAML.load(file)
+        pp object
 
 	end
 
@@ -25,7 +31,7 @@ class GameManager
 			@gameBoard.drawBoard(@players[0], @players[1])
 
 			ret1 = @players[@currentPlayer].makeMove(@gameBoard)
-			
+
 			if ret1 == -1
 				forfeit(@currentPlayer)
 			elsif ret1 == -2
@@ -42,13 +48,10 @@ class GameManager
 			end
 
 		end
-		
+
 	end
 
 	#not done
-	def saveGame()
-		to_s()
-	end
 
 	#not done
 	def checkGameOver()
@@ -57,15 +60,15 @@ class GameManager
 			puts("Game has ended in draw\n")
 			return true
 		end
-		
+
 		if @currentPlayer == 0
 			currentColour = :white
 		else
 			currentColour = :black
 		end
-			
+
 		puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour).to_s()
-			
+
 		if @gameBoard.pieces(:empty) == 0 and @players[@currentPlayer].handPieces(@gameBoard) == 0 and @gameBoard.availableMove(currentColour) == false
 			puts("Game Over\n")
 			if @players[0].pieces(@gameBoard) > @players[1].pieces(@gameBoard)
@@ -77,24 +80,28 @@ class GameManager
 			end
 			return true
 		end
-		
-		if @players[0].pieces(@gameBoard) == 0 
+
+		if @players[0].pieces(@gameBoard) == 0
 			puts("Black Player Wins\n")
 			return true
-		elsif @players[1].pieces(@gameBoard) == 0 
+		elsif @players[1].pieces(@gameBoard) == 0
 			puts("White Player Wins\n")
 			return true
 		end
-		
+
 		return false
 	end
 
+	def saveGame()
+        file = File.open("YoteSave", "w")
+        file.puts self.to_yaml
+        file.close
+	end
+
+
 	#not done
 	def to_s()
-		# "In Position: #{@position} #{@piece}\n"
-		# @currentPlayer = 0
-		# @player = Array.new(2)
-
+        "In GameManager:\n #{@currentPlayer} #{@players} #{@gameBoard.to_s}"
 	end
 
 	def forfeit(colour)
@@ -115,7 +122,7 @@ class Hand
 	#done
 	def initialize(playerColour)
 		@playerColour = playerColour
-		@pieceCount = 4
+		@pieceCount = 12
 	end
 
 	#done
@@ -152,7 +159,7 @@ class YoteIO
 	def serializeGame(game, filename)
 
 	end
- 
+
 	#not done
 	def unserializeGame(filename)
 
@@ -315,7 +322,7 @@ class Player
 			elsif execute == 2
 				@playerHand.removePiece();
 			end
-				
+
 			storeLastMove(move)
 
 			return 0
@@ -328,7 +335,7 @@ class Player
 	def pieces(board)
 		return @playerHand.pieces() + board.pieces(@playerColour)
 	end
-	
+
 	#method not in the document, created to show only the remaining hand pieces
 	def handPieces(board)
 		return @playerHand.pieces()
@@ -338,6 +345,10 @@ class Player
 	def storeLastMove(lastMove)
 		@lastMove = lastMove
 	end
+
+    def to_s
+        "In Player:\n #{@playerColour} #{@playerHand.to_s} #{@lastMove.to_s}"
+    end
 
 end
 
@@ -409,9 +420,9 @@ class Board
 	    end
 
 	    puts("Remaining pieces:")
-	    puts "p1: In hand - " + player1.handPieces(self).to_s() + ", On Board - " + 
+	    puts "p1: In hand - " + player1.handPieces(self).to_s() + ", On Board - " +
 	    	self.pieces(player1.instance_variable_get(:@playerColour)).to_s() + ", Total - " + player1.pieces(self).to_s()
-	    puts "p2: In hand - " + player2.handPieces(self).to_s() + ", On Board - " + 
+	    puts "p2: In hand - " + player2.handPieces(self).to_s() + ", On Board - " +
 	    	self.pieces(player2.instance_variable_get(:@playerColour)).to_s() + ", Total - " + player2.pieces(self).to_s()
 	end
 
@@ -466,7 +477,7 @@ class Board
 	end
 
 	def to_s()
-		"In Board:\n #{@rows} #{@columns} #{@board}\n"
+		"In Board:\n #{@rows} #{@columns} #{@board.to_s}\n"
 	end
 
 end
@@ -546,7 +557,7 @@ class Move
 
 	#done
 	def to_s()
-		"In Move: #{@source} #{@destination} #{@playerColour} #{@move} #{@gameBoard.to_s} \n"
+		"In Move: #{@source} #{@destination} #{@playerColour} #{@move} \n"
 	end
 
 	#done
@@ -556,7 +567,7 @@ class Move
 
 		# check if its a placement move by simply checking if the source coordinate does not exist
 		if @source.nil? and @gameBoard.atPosition(@destination) == :empty
-			
+
 			return :placement
 		end
 
@@ -607,7 +618,7 @@ class Move
 			@gameBoard.removeAt(@source)
 			jumped = [(@destination[0] + @source[0]) / 2, (@destination[1] + @source[1]) / 2]
 			@gameBoard.removeAt(jumped)
-			
+
 			if @playerColour == :white
 				oppositeColour = :black
 			else
@@ -623,8 +634,11 @@ class Move
 		end
 	end
 
+
 end
 
+puts "Enter a file name to load a game (press enter if no file or wish to start a new game)"
+input = gets.chomp
 
-manage = GameManager.new()
+manage = GameManager.new(input)
 manage.newGame()
