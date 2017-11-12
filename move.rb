@@ -32,12 +32,12 @@ class GameManager
 			if ret2 == false
 				@currentPlayer = (@currentPlayer + 1) % 2
 			else
-				# puts("Winning player: #{@currentPlayer}")
-				# ret
+				#break out of loop if game over
+				break
 			end
 
-
 		end
+		
 	end
 
 	#not done
@@ -47,9 +47,25 @@ class GameManager
 
 	#not done
 	def checkGameOver()
-		0.upto(2) do |i|
-			# @players[i].pieces()
+		#checking player pieces, not pieceCount as the doc accidentally says
+		if @players[0].pieces(@gameBoard) < 4 and @players[1].pieces(@gameBoard) < 4
+			#puts("Winning player: #{@currentPlayer}")
+			puts("Game has ended in draw\n")
+			return true
 		end
+		
+		if @gameBoard.pieces(:empty) == 0 and @players[@currentPlayer].handPieces(@gameBoard) == 0 and @gameBoard.availableMove()
+			puts("Game Over\n")
+			if @players[0].pieces(@gameBoard) > @players[1].pieces(@gameBoard)
+				puts("White Player Wins\n")
+			elsif
+				puts("Black Player Wins\n")
+			else
+				puts("Game has ended in draw\n")
+			end
+			return true
+		end
+		
 		return false
 	end
 
@@ -171,7 +187,7 @@ class YoteIO
 					res = nil
 				end
 			end
-			puts "coordinates  = #{res}"
+			#puts "coordinates  = #{res}"
 			return res
 		end
 
@@ -284,7 +300,7 @@ class Player
 		return @playerHand.pieces() + board.pieces(@playerColour)
 	end
 	
-	#method not from doc, created to show remaining hand pieces only
+	#method not in the document, created to show only the remaining hand pieces
 	def handPieces(board)
 		return @playerHand.pieces()
 	end
@@ -364,12 +380,10 @@ class Board
 	    end
 
 	    puts("Remaining pieces:")
-	    puts("p1: \n")
-	    p player1.handPieces(self)
-	    p self.pieces(player1.instance_variable_get(:@playerColour))
-	    puts("p2: \n")
-	    p player2.handPieces(self)
-	    p self.pieces(player2.instance_variable_get(:@playerColour))
+	    puts "p1: In hand - " + player1.handPieces(self).to_s() + ", On Board - " + 
+	    	self.pieces(player1.instance_variable_get(:@playerColour)).to_s() + ", Total - " + player1.pieces(self).to_s()
+	    puts "p2: In hand - " + player2.handPieces(self).to_s() + ", On Board - " + 
+	    	self.pieces(player2.instance_variable_get(:@playerColour)).to_s() + ", Total - " + player2.pieces(self).to_s()
 	end
 
 	#done
