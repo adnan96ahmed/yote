@@ -24,11 +24,17 @@ class GameManager
 
 			@gameBoard.drawBoard(@players[0], @players[1])
 
-			@players[@currentPlayer].makeMove(@gameBoard)
+			ret1 = @players[@currentPlayer].makeMove(@gameBoard)
+			
+			if ret1 == -1
+				forfeit(@currentPlayer)
+			elsif ret1 == -2
+				saveGame()
+			end
 
-			ret = checkGameOver()
+			ret2 = checkGameOver()
 
-			if ret == false
+			if ret2 == false
 				@currentPlayer = (@currentPlayer + 1) % 2
 			else
 				#break out of loop if game over
@@ -41,7 +47,7 @@ class GameManager
 
 	#not done
 	def saveGame()
-
+		to_s()
 	end
 
 	#not done
@@ -58,7 +64,7 @@ class GameManager
 			currentColour = :black
 		end
 			
-		#puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour).to_s()
+		puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour).to_s()
 			
 		if @gameBoard.pieces(:empty) == 0 and @players[@currentPlayer].handPieces(@gameBoard) == 0 and @gameBoard.availableMove(currentColour) == false
 			puts("Game Over\n")
@@ -91,9 +97,16 @@ class GameManager
 
 	end
 
-	#not done
 	def forfeit(colour)
-
+		if colour == 0
+			currentColour = :white
+			otherColour = :black
+		else
+			currentColour = :black
+			otherColour = :white
+		end
+		puts currentColour.to_s() + " has forfeited and " + otherColour.to_s() + " has won the game\n"
+		exit!
 	end
 end
 
@@ -139,7 +152,7 @@ class YoteIO
 	def serializeGame(game, filename)
 
 	end
-
+ 
 	#not done
 	def unserializeGame(filename)
 
@@ -149,62 +162,58 @@ class YoteIO
 	# letters are supposed to refer to the rows
 	def getCoordinates(prompt)
 		puts prompt
-		res = 0
-		input = gets.chomp
-		if input.eql? 'forfeit'
-			return [-1, -1]
-		elsif input.eql? 'save'
-			return [-2, -2]
-		else
-			coords1 = Hash.new()
-			coords1["a"] = 0
-			coords1["b"] = 1
-			coords1["c"] = 2
-			coords1["d"] = 3
-			coords1["e"] = 4
-			coords1["f"] = 5
-
-			regex1 = /[0-4]+[a-eA-E]/
-			regex2 = /[a-eA-E]+[0-4]/
-
-			if prompt.include? "source"
-
-				if regex1.match(input)
-					x = Integer(input[0])
-					y = coords1[input[1]]
-					res = [x, y]
-				elsif regex2.match(input)
-					x = Integer(input[1])
-					y = coords1[input[0]]
-					res = [x, y]
-				elsif input.empty?
-					res = nil
-				end
-			else
-
-				if regex1.match(input)
-					if /^$/.match(input)
-						res = nil
-					end
-					x = Integer(input[0])
-					y = coords1[input[1]]
-					res = [x, y]
-
-				elsif regex2.match(input)
-					if /^$/.match(input)
-						res = nil
-					end
-					x = Integer(input[1])
-					y = coords1[input[0]]
-					res = [x, y]
-				else
-					res = nil
-				end
-			end
-			#puts "coordinates  = #{res}"
-			return res
-		end
-
+        res = 0
+        input = gets.chomp
+        if input.eql? 'forfeit'
+            return [-1, -1]
+        elsif input.eql? 'save'
+            return [-2, -2]
+        elsif input.length == 2 or input.to_s.empty?
+            coords1 = Hash.new()
+            coords1["a"] = 0
+            coords1["b"] = 1
+            coords1["c"] = 2
+            coords1["d"] = 3
+            coords1["e"] = 4
+            coords1["f"] = 5
+            regex1 = /[0-4]+[a-eA-E]/
+            regex2 = /[a-eA-E]+[0-4]/
+            if prompt.include? "source"
+                if regex1.match(input)
+                    x = Integer(input[0])
+                    y = coords1[input[1]]
+                    res = [x, y]
+                elsif regex2.match(input)
+                    x = Integer(input[1])
+                    y = coords1[input[0]]
+                    res = [x, y]
+                elsif input.empty?
+                    res = nil
+                end
+            else
+                if regex1.match(input)
+                    if /^$/.match(input)
+                        res = nil
+                    end
+                    x = Integer(input[0])
+                    y = coords1[input[1]]
+                    res = [x, y]
+                elsif regex2.match(input)
+                    if /^$/.match(input)
+                        res = nil
+                    end
+                    x = Integer(input[1])
+                    y = coords1[input[0]]
+                    res = [x, y]
+                else
+                    res = nil
+                end
+            end
+            #puts "coordinates  = #{res}"
+            return res
+        else
+            return [-3,-3]
+        end
 	end
 
 	#done
@@ -242,6 +251,9 @@ class Player
 			elsif res1 == [-2, -2]
 				puts "save"
 				return -2
+			elsif res1 == [-3,-3]
+                puts "Cannot place a negative number"
+                next
 			end
 
 			res2 = io.getCoordinates("Please enter the destination coordinate\n")
@@ -252,6 +264,9 @@ class Player
 			elsif res2 == [-2, -2]
 				puts "save"
 				return -2
+			elsif res2 == [-3,-3]
+                puts "Cannot place a negative number"
+                next
 			end
 
 			if res2 == nil
