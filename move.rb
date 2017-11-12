@@ -299,7 +299,7 @@ class Player
                 #loop after capture to ask player to select an opponents piece to remove
                 loop do
                     removeSelection = io.getCoordinates("Select a coordinate of an opponent's piece for it to be removed\n")
-                    p removeSelection
+
                     #removeSelection coordinate cannot be empty or the same colour as the player selecting
                     if removeSelection.nil? or gameBoard.atPosition(removeSelection) == :empty or gameBoard.atPosition(removeSelection) == @playerColour
                         puts("An invalid coordinate was selected for removing an opponent's piece")
