@@ -60,7 +60,7 @@ class GameManager
 			currentColour = :black
 		end
 			
-		#puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour)
+		puts "check end game: " + @gameBoard.pieces(:empty).to_s() + " " + @players[@currentPlayer].handPieces(@gameBoard).to_s() + " " + @gameBoard.availableMove(currentColour).to_s()
 			
 		if @gameBoard.pieces(:empty) == 0 and @players[@currentPlayer].handPieces(@gameBoard) == 0 and @gameBoard.availableMove(currentColour) == false
 			puts("Game Over\n")
@@ -434,7 +434,7 @@ class Board
 			for j in 0..5
 				if self.atPosition([i,j]) == colour
 					#temp.push(@board[i][j])
-					move = Move.new(self.atPosition([i,j]), 0, colour, self)
+					move = Move.new([i,j], [0,0], colour, self)
 					val = move.isPossibleMove()
 					if val == true
 						return true
