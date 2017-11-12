@@ -4,12 +4,12 @@ players:
 - !ruby/object:Player
   playerHand: !ruby/object:Hand
     playerColour: :white
-    pieceCount: 11
+    pieceCount: 10
   lastMove: !ruby/object:Move
     source: 
     destination:
-    - 1
-    - 0
+    - 2
+    - 3
     playerColour: :white
     gameBoard: &1 !ruby/object:Board
       rows: 5
@@ -29,74 +29,74 @@ players:
           position:
           - 0
           - 2
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 0
-          - 3
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 0
-          - 4
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 0
-          - 5
-          piece: :empty
-      - - !ruby/object:Position
-          position:
-          - 1
-          - 0
           piece: :white
         - !ruby/object:Position
           position:
-          - 1
-          - 1
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 1
-          - 2
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 1
-          - 3
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 1
-          - 4
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 1
-          - 5
-          piece: :empty
-      - - !ruby/object:Position
-          position:
-          - 2
           - 0
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 2
-          - 1
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 2
-          - 2
-          piece: :empty
-        - !ruby/object:Position
-          position:
-          - 2
           - 3
           piece: :black
         - !ruby/object:Position
           position:
+          - 0
+          - 4
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 0
+          - 5
+          piece: :empty
+      - - !ruby/object:Position
+          position:
+          - 1
+          - 0
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 1
+          - 1
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 1
+          - 2
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 1
+          - 3
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 1
+          - 4
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 1
+          - 5
+          piece: :empty
+      - - !ruby/object:Position
+          position:
+          - 2
+          - 0
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 2
+          - 1
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 2
+          - 2
+          piece: :empty
+        - !ruby/object:Position
+          position:
+          - 2
+          - 3
+          piece: :white
+        - !ruby/object:Position
+          position:
           - 2
           - 4
           piece: :empty
@@ -159,7 +159,7 @@ players:
           position:
           - 4
           - 4
-          piece: :empty
+          piece: :black
         - !ruby/object:Position
           position:
           - 4
@@ -170,12 +170,12 @@ players:
 - !ruby/object:Player
   playerHand: !ruby/object:Hand
     playerColour: :black
-    pieceCount: 11
+    pieceCount: 10
   lastMove: !ruby/object:Move
     source: 
     destination:
-    - 2
-    - 3
+    - 4
+    - 4
     playerColour: :black
     gameBoard: *1
     move: :placement

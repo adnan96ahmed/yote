@@ -89,14 +89,15 @@ class GameManager
 	end
 
 	def saveGame()
+        puts self
         file = File.open("YoteSave", "w")
-        file.puts self.to_yaml
+        file.puts YAML::dump(self)
         file.close
 	end
 
 	#done
 	def to_s()
-        "In GameManager:\n #{@currentPlayer} #{@players} #{@gameBoard.to_s}"
+        "In GameManager:\n #{@currentPlayer} #{@players[0].to_s} #{@players[1].to_s} #{@gameBoard.to_s}"
 	end
 
 	def forfeit(colour)
@@ -425,7 +426,6 @@ class Board
 		if colour == :empty or (coord[0] === (0..@rows) and coord[1] === (0..@columns))
 			return false
 		else
-			p colour
 			@board[coord[0]][coord[1]].setPosition(colour)
 			return true
 		end
@@ -490,9 +490,9 @@ class Move
 
 		if lastMove.instance_variable_get(:@move) == :illegal or lastMove.instance_variable_get(:@move) == :placement or lastMove.instance_variable_get(:@move) == :capture
 			return false
-		elsif (lastMove.destination != @source)
+		elsif (lastMove.instance_variable_get(:@destination) != @source)
 			return false
-		elsif (lastMove.source == @destination)
+		elsif (lastMove.instance_variable_get(:@source) == @destination)
 			return true
 		end
 
