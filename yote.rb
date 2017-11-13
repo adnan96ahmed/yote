@@ -17,13 +17,6 @@ class GameManager
 
 	end
 
-	#not done
-	def loadGame(filename)
-        file = File.open(filename.to_s, "r")
-        object = YAML.load(file)
-
-	end
-
 	def newGame()
 		loop do
 
@@ -148,16 +141,6 @@ class Hand
 end
 
 class YoteIO
-
-	#not done
-	def serializeGame(game, filename)
-
-	end
-
-	#not done
-	def unserializeGame(filename)
-
-	end
 
 	def getCoordinates(prompt)
 		puts prompt
